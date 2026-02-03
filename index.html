@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="kh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Facebook Data Submission</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #1877F2; /* Facebook Blue */
+      --primary-hover: #155db2;
+      --bg-color: #f0f2f5;
+      --card-bg: #ffffff;
+      --text-main: #1c1e21;
+      --text-secondary: #65676b;
+      --icon-color: #aeb0b3;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Kantumruy Pro', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 850px;
+      padding: 35px;
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 30px;
+      font-weight: 700;
+      font-size: 24px;
+    }
+
+    h2 i { margin-right: 10px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .full { grid-column: 1 / -1; }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+    }
+    
+    label i { margin-right: 8px; color: var(--primary); font-size: 13px;}
+
+    /* --- Styles សម្រាប់ Input ដែលមាន Icon --- */
+    .input-icon-wrap {
+      position: relative;
+    }
+
+    .input-icon-wrap i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--icon-color);
+      font-size: 16px;
+      pointer-events: none; /* អនុញ្ញាតឱ្យចុចឆ្លងកាត់ Icon ទៅ Input */
+      transition: color 0.3s ease;
+    }
+
+    /* សម្រាប់ Textarea ឱ្យ Icon នៅខាងលើ */
+    .input-icon-wrap textarea + i {
+        top: 15px;
+        transform: none;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 12px 12px 42px; /* Padding ខាងឆ្វេងធំជាងមុន ដើម្បីទុកកន្លែងឱ្យ Icon */
+      border: 1px solid #dfe1e5;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 15px;
+      transition: all 0.2s;
+      box-sizing: border-box;
+      background-color: #fcfcfc;
+    }
+
+    /* ពេលចុចលើ Input ឱ្យប្តូរពណ៌ Border និង Icon */
+    input:focus, textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.15);
+      background-color: #fff;
+    }
+    
+    .input-icon-wrap:focus-within i {
+      color: var(--primary);
+    }
+
+
+    textarea { min-height: 100px; resize: vertical; }
+
+    /* Custom Checkbox for Show Password */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+    }
+    .toggle-row input { width: auto; cursor: pointer; padding: 0; }
+    .toggle-row i { color: var(--text-secondary); font-size: 14px; margin-right: 4px;}
+
+    /* Button Styling */
+    button[type="submit"] {
+      background: linear-gradient(to bottom right, var(--primary), var(--primary-hover));
+      color: white;
+      font-weight: bold;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    button[type="submit"]:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+    }
+    button[type="submit"]:active:not(:disabled) { transform: translateY(0); }
+    button:disabled { opacity: 0.7; cursor: not-allowed; background: #ccc; }
+
+    /* Hint text */
+    .hint { font-size: 12px; color: #888; margin-top: 6px; margin-left: 4px; display: flex; align-items: center;}
+    .hint i { font-size: 10px; margin-right: 5px; }
+
+    /* Responsive for mobile */
+    @media (max-width: 600px) {
+      .container { padding: 20px; }
+      .grid { grid-template-columns: 1fr; gap: 15px;}
+    }
+
+    /* Tom Select Customization overrides */
+    .ts-control {
+      padding: 12px 12px 12px 15px !important; /* Tom select មិនត្រូវការ padding ឆ្វេងច្រើនពេកទេ */
+      border-radius: 8px !important;
+      border-color: #dfe1e5 !important;
+      font-size: 15px !important;
+      background-color: #fcfcfc !important;
+    }
+    .ts-wrapper.focus .ts-control {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.15) !important;
+        background-color: #fff !important;
+    }
+    .ts-dropdown { border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #eee;}
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2><i class="fab fa-facebook"></i> បំពេញទិន្នន័យ Create Facebook</h2>
+    
+    <form id="fbForm">
+      <div class="grid">
+        
+        <div class="form-group icon-field">
+          <label><i class="fas fa-user-circle"></i> ឈ្មោះ (Name)</label>
+          <select id="nameSelect" name="name" placeholder="ស្វែងរក ឬ ជ្រើសរើសឈ្មោះ...">
+            <option value="">កំពុងទាញឈ្មោះ...</option>
+          </select>
+          <div class="hint"><i class="fas fa-info-circle"></i> ទិន្នន័យពី Sheet: DB!A1:A25</div>
+        </div>
+
+        <div class="form-group">
+          <label>អ៊ីមែល (Email)</label>
+          <div class="input-icon-wrap">
+            <input name="email" type="email" placeholder="example@email.com" />
+            <i class="fas fa-envelope"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>ពាក្យសម្ងាត់អ៊ីមែល (Pass Email)</label>
+          <div class="input-icon-wrap">
+            <input id="passwordEmail" name="passwordEmail" type="password" placeholder="Password email" />
+            <i class="fas fa-lock"></i>
+          </div>
+          <label class="toggle-row">
+            <input type="checkbox" data-toggle="passwordEmail" /> 
+            <i class="fas fa-eye"></i> បង្ហាញពាក្យសម្ងាត់
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label>UID</label>
+          <div class="input-icon-wrap">
+             <input name="uid" placeholder="UID Example: 1000..." />
+             <i class="fas fa-id-badge"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>ពាក្យសម្ងាត់ Account (Pass FB)</label>
+          <div class="input-icon-wrap">
+            <input id="passwordAccount" name="passwordAccount" type="password" placeholder="Password account" />
+            <i class="fas fa-key"></i>
+          </div>
+          <label class="toggle-row">
+            <input type="checkbox" data-toggle="passwordAccount" />
+            <i class="fas fa-eye"></i> បង្ហាញពាក្យសម្ងាត់
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label>2FA Key</label>
+          <div class="input-icon-wrap">
+            <input name="twoFA" placeholder="Enter 2FA key" />
+            <i class="fas fa-shield-alt"></i>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label>Link Account</label>
+          <div class="input-icon-wrap">
+            <input name="linkAccount" placeholder="https://facebook.com/..." />
+            <i class="fas fa-link"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>កាលបរិច្ឆេទបង្កើត (Date Create)</label>
+          <div class="input-icon-wrap">
+            <input name="dateCreate" type="date" />
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label>Reason (មូលហេតុ)</label>
+          <div class="input-icon-wrap">
+            <textarea name="reason" placeholder="សរសេរមូលហេតុនៅទីនេះ (បើមាន field ខ្វះ)..."></textarea>
+            <i class="fas fa-comment-dots"></i>
+          </div>
+        </div>
+
+        <div class="full">
+          <button id="btnSubmit" type="submit">
+            <i class="fas fa-paper-plane"></i>
+            <span id="btnText">Submit Data</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    // ✅ ដាក់ Link Web App របស់អ្នកនៅទីនេះ
+    const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzVQPXevFvc4R_h-GBVygSlrPZof_jxJKf_y-zHvevw2Kuux9SYWv6sIP5_-MyBenJGqw/exec"; 
+
+    let tomSelectInstance;
+
+    // 1. មុខងារទាញឈ្មោះពី Google Sheet (JSONP)
+    async function fetchNames() {
+      return new Promise((resolve, reject) => {
+        if (!APPS_SCRIPT_WEBAPP_URL || APPS_SCRIPT_WEBAPP_URL.includes("PASTE_YOUR_WEBAPP_URL")) {
+          reject("Please update the Web App URL in the code.");
+          return;
+        }
+        const cbName = "cb_" + Math.random().toString(36).slice(2);
+        window[cbName] = (res) => {
+          delete window[cbName];
+          document.getElementById(cbName).remove();
+          if (res && res.names) resolve(res.names);
+          else reject("No names found or invalid response.");
+        };
+        const script = document.createElement("script");
+        script.id = cbName;
+        script.src = `${APPS_SCRIPT_WEBAPP_URL}?action=names&callback=${cbName}`;
+        script.onerror = () => reject("Failed to load script.");
+        document.body.appendChild(script);
+      });
+    }
+
+    // 2. Initialize ហ្វម និង Dropdown
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Init Tom Select
+      tomSelectInstance = new TomSelect("#nameSelect", {
+        create: false,
+        sortField: { field: "text", direction: "asc" },
+        placeholder: "ស្វែងរក ឬ ជ្រើសរើសឈ្មោះ...",
+        maxOptions: null,
+        render: {
+            // បន្ថែម Icon ក្នុង Dropdown list (optional)
+            option: function(data, escape) {
+                return '<div><i class="fas fa-user fa-sm text-muted me-2"></i> ' + escape(data.text) + '</div>';
+            },
+            item: function(data, escape) {
+                 return '<div><i class="fas fa-user fa-sm text-muted me-2"></i> ' + escape(data.text) + '</div>';
+            }
+        }
+      });
+      
+      tomSelectInstance.disable();
+      tomSelectInstance.clearOptions();
+      tomSelectInstance.addOption({value: "", text: "កំពុងទាញទិន្នន័យ..."});
+      tomSelectInstance.addItem("");
+
+      try {
+        const names = await fetchNames();
+        tomSelectInstance.clear();
+        tomSelectInstance.clearOptions();
+        names.forEach(name => {
+          tomSelectInstance.addOption({ value: name, text: name });
+        });
+        tomSelectInstance.enable();
+      } catch (err) {
+        console.error(err);
+        tomSelectInstance.clearOptions();
+        tomSelectInstance.addOption({value: "", text: "បរាជ័យក្នុងការទាញឈ្មោះ"});
+        tomSelectInstance.addItem("");
+      }
+    });
+
+    // 3. មុខងារ Show/Hide Password (ជាមួយការប្តូរ Icon)
+    document.querySelectorAll('input[type="checkbox"][data-toggle]').forEach(cb => {
+      cb.addEventListener("change", (e) => {
+        const inputId = e.target.dataset.toggle;
+        const input = document.getElementById(inputId);
+        const icon = e.target.parentElement.querySelector('i'); // ស្វែងរក icon ដែលនៅជិត checkbox
+
+        if (input) {
+            input.type = e.target.checked ? "text" : "password";
+            // ប្តូររូប icon ភ្នែក
+            if(icon) {
+                icon.className = e.target.checked ? "fas fa-eye-slash" : "fas fa-eye";
+            }
+        }
+      });
+    });
+
+    // 4. មុខងារ Submit Form
+    const form = document.getElementById("fbForm");
+    const btn = document.getElementById("btnSubmit");
+    const btnText = document.getElementById("btnText");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const fd = new FormData(form);
+      const data = Object.fromEntries(fd.entries());
+      const required = ['name', 'email', 'passwordEmail', 'uid', 'passwordAccount', 'twoFA', 'linkAccount', 'dateCreate'];
+      const isMissing = required.some(key => !data[key]);
+
+      if (isMissing && !data.reason) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'ព័ត៌មានមិនគ្រប់គ្រាន់!',
+          text: 'សូមបំពេញ Field សំខាន់ៗ ឬបញ្ជាក់មូលហេតុ (Reason)។',
+          confirmButtonColor: '#f39c12'
+        });
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> កំពុងបញ្ជូន...'; // ដាក់ Icon loading
+      
+      try {
+        await fetch(APPS_SCRIPT_WEBAPP_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        Swal.fire({
+          icon: 'success',
+          title: 'ជោគជ័យ!',
+          text: 'ទិន្នន័យត្រូវបានរក្សាទុក។',
+          confirmButtonColor: '#1877F2',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        form.reset();
+        if(tomSelectInstance) tomSelectInstance.clear();
+
+      } catch (error) {
+        Swal.fire({ icon: 'error', title: 'បរាជ័យ!', text: error });
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Data'; // ដាក់ Icon ដើមវិញ
+      }
+    });
+  </script>
+</body>
+</html>
