@@ -12,7 +12,7 @@
   
   <style>
     :root {
-      --primary: #1877F2; /* Facebook Blue */
+      --primary: #1877F2;
       --primary-hover: #155db2;
       --bg-color: #f0f2f5;
       --card-bg: #ffffff;
@@ -75,10 +75,8 @@
     
     label i { margin-right: 8px; color: var(--primary); font-size: 13px;}
 
-    /* --- Styles សម្រាប់ Input ដែលមាន Icon --- */
-    .input-icon-wrap {
-      position: relative;
-    }
+    /* Input Icon Styles */
+    .input-icon-wrap { position: relative; }
 
     .input-icon-wrap i {
       position: absolute;
@@ -87,19 +85,15 @@
       transform: translateY(-50%);
       color: var(--icon-color);
       font-size: 16px;
-      pointer-events: none; /* អនុញ្ញាតឱ្យចុចឆ្លងកាត់ Icon ទៅ Input */
+      pointer-events: none;
       transition: color 0.3s ease;
     }
 
-    /* សម្រាប់ Textarea ឱ្យ Icon នៅខាងលើ */
-    .input-icon-wrap textarea + i {
-        top: 15px;
-        transform: none;
-    }
+    .input-icon-wrap textarea + i { top: 15px; transform: none; }
 
     input, textarea, select {
       width: 100%;
-      padding: 12px 12px 12px 42px; /* Padding ខាងឆ្វេងធំជាងមុន ដើម្បីទុកកន្លែងឱ្យ Icon */
+      padding: 12px 12px 12px 42px;
       border: 1px solid #dfe1e5;
       border-radius: 8px;
       font-family: inherit;
@@ -109,7 +103,6 @@
       background-color: #fcfcfc;
     }
 
-    /* ពេលចុចលើ Input ឱ្យប្តូរពណ៌ Border និង Icon */
     input:focus, textarea:focus {
       border-color: var(--primary);
       outline: none;
@@ -117,14 +110,11 @@
       background-color: #fff;
     }
     
-    .input-icon-wrap:focus-within i {
-      color: var(--primary);
-    }
-
+    .input-icon-wrap:focus-within i { color: var(--primary); }
 
     textarea { min-height: 100px; resize: vertical; }
 
-    /* Custom Checkbox for Show Password */
+    /* Toggle Password */
     .toggle-row {
       display: flex;
       align-items: center;
@@ -138,7 +128,7 @@
     .toggle-row input { width: auto; cursor: pointer; padding: 0; }
     .toggle-row i { color: var(--text-secondary); font-size: 14px; margin-right: 4px;}
 
-    /* Button Styling */
+    /* Button */
     button[type="submit"] {
       background: linear-gradient(to bottom right, var(--primary), var(--primary-hover));
       color: white;
@@ -160,22 +150,19 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
     }
-    button[type="submit"]:active:not(:disabled) { transform: translateY(0); }
     button:disabled { opacity: 0.7; cursor: not-allowed; background: #ccc; }
 
-    /* Hint text */
     .hint { font-size: 12px; color: #888; margin-top: 6px; margin-left: 4px; display: flex; align-items: center;}
     .hint i { font-size: 10px; margin-right: 5px; }
 
-    /* Responsive for mobile */
     @media (max-width: 600px) {
       .container { padding: 20px; }
       .grid { grid-template-columns: 1fr; gap: 15px;}
     }
 
-    /* Tom Select Customization overrides */
+    /* Tom Select Overrides */
     .ts-control {
-      padding: 12px 12px 12px 15px !important; /* Tom select មិនត្រូវការ padding ឆ្វេងច្រើនពេកទេ */
+      padding: 12px 12px 12px 15px !important;
       border-radius: 8px !important;
       border-color: #dfe1e5 !important;
       font-size: 15px !important;
@@ -206,10 +193,10 @@
         </div>
 
         <div class="form-group">
-          <label>អ៊ីមែល (Email)</label>
+          <label>អ៊ីមែល ឬ លេខទូរស័ព្ទ (Email / Phone)</label>
           <div class="input-icon-wrap">
-            <input name="email" type="email" placeholder="example@email.com" />
-            <i class="fas fa-envelope"></i>
+            <input name="email" type="text" placeholder="example@email.com / 096xxxxxx" />
+            <i class="fas fa-address-card"></i>
           </div>
         </div>
 
@@ -291,12 +278,10 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
-    // ✅ ដាក់ Link Web App របស់អ្នកនៅទីនេះ
     const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzVQPXevFvc4R_h-GBVygSlrPZof_jxJKf_y-zHvevw2Kuux9SYWv6sIP5_-MyBenJGqw/exec"; 
 
     let tomSelectInstance;
 
-    // 1. មុខងារទាញឈ្មោះពី Google Sheet (JSONP)
     async function fetchNames() {
       return new Promise((resolve, reject) => {
         if (!APPS_SCRIPT_WEBAPP_URL || APPS_SCRIPT_WEBAPP_URL.includes("PASTE_YOUR_WEBAPP_URL")) {
@@ -308,7 +293,7 @@
           delete window[cbName];
           document.getElementById(cbName).remove();
           if (res && res.names) resolve(res.names);
-          else reject("No names found or invalid response.");
+          else reject("No names found.");
         };
         const script = document.createElement("script");
         script.id = cbName;
@@ -318,16 +303,13 @@
       });
     }
 
-    // 2. Initialize ហ្វម និង Dropdown
     document.addEventListener("DOMContentLoaded", async () => {
-      // Init Tom Select
       tomSelectInstance = new TomSelect("#nameSelect", {
         create: false,
         sortField: { field: "text", direction: "asc" },
         placeholder: "ស្វែងរក ឬ ជ្រើសរើសឈ្មោះ...",
         maxOptions: null,
         render: {
-            // បន្ថែម Icon ក្នុង Dropdown list (optional)
             option: function(data, escape) {
                 return '<div><i class="fas fa-user fa-sm text-muted me-2"></i> ' + escape(data.text) + '</div>';
             },
@@ -351,34 +333,26 @@
         });
         tomSelectInstance.enable();
       } catch (err) {
-        console.error(err);
         tomSelectInstance.clearOptions();
         tomSelectInstance.addOption({value: "", text: "បរាជ័យក្នុងការទាញឈ្មោះ"});
         tomSelectInstance.addItem("");
       }
     });
 
-    // 3. មុខងារ Show/Hide Password (ជាមួយការប្តូរ Icon)
     document.querySelectorAll('input[type="checkbox"][data-toggle]').forEach(cb => {
       cb.addEventListener("change", (e) => {
         const inputId = e.target.dataset.toggle;
         const input = document.getElementById(inputId);
-        const icon = e.target.parentElement.querySelector('i'); // ស្វែងរក icon ដែលនៅជិត checkbox
-
+        const icon = e.target.parentElement.querySelector('i');
         if (input) {
             input.type = e.target.checked ? "text" : "password";
-            // ប្តូររូប icon ភ្នែក
-            if(icon) {
-                icon.className = e.target.checked ? "fas fa-eye-slash" : "fas fa-eye";
-            }
+            if(icon) icon.className = e.target.checked ? "fas fa-eye-slash" : "fas fa-eye";
         }
       });
     });
 
-    // 4. មុខងារ Submit Form
     const form = document.getElementById("fbForm");
     const btn = document.getElementById("btnSubmit");
-    const btnText = document.getElementById("btnText");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -399,7 +373,7 @@
       }
 
       btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> កំពុងបញ្ជូន...'; // ដាក់ Icon loading
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> កំពុងបញ្ជូន...';
       
       try {
         await fetch(APPS_SCRIPT_WEBAPP_URL, {
@@ -424,7 +398,7 @@
         Swal.fire({ icon: 'error', title: 'បរាជ័យ!', text: error });
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Data'; // ដាក់ Icon ដើមវិញ
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Data';
       }
     });
   </script>
