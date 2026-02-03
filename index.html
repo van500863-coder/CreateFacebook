@@ -7,7 +7,6 @@
   
   <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  
   <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
   
   <style>
@@ -75,7 +74,6 @@
     
     label i { margin-right: 8px; color: var(--primary); font-size: 13px;}
 
-    /* Input Icon Styles */
     .input-icon-wrap { position: relative; }
 
     .input-icon-wrap i {
@@ -88,8 +86,6 @@
       pointer-events: none;
       transition: color 0.3s ease;
     }
-
-    .input-icon-wrap textarea + i { top: 15px; transform: none; }
 
     input, textarea, select {
       width: 100%;
@@ -114,7 +110,6 @@
 
     textarea { min-height: 100px; resize: vertical; }
 
-    /* Toggle Password */
     .toggle-row {
       display: flex;
       align-items: center;
@@ -126,9 +121,7 @@
       user-select: none;
     }
     .toggle-row input { width: auto; cursor: pointer; padding: 0; }
-    .toggle-row i { color: var(--text-secondary); font-size: 14px; margin-right: 4px;}
 
-    /* Button */
     button[type="submit"] {
       background: linear-gradient(to bottom right, var(--primary), var(--primary-hover));
       color: white;
@@ -150,30 +143,21 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
     }
-    button:disabled { opacity: 0.7; cursor: not-allowed; background: #ccc; }
 
     .hint { font-size: 12px; color: #888; margin-top: 6px; margin-left: 4px; display: flex; align-items: center;}
-    .hint i { font-size: 10px; margin-right: 5px; }
+    .optional-hint { color: var(--primary); font-style: italic; font-size: 11px; margin-top: 4px; }
 
     @media (max-width: 600px) {
       .container { padding: 20px; }
       .grid { grid-template-columns: 1fr; gap: 15px;}
     }
 
-    /* Tom Select Overrides */
     .ts-control {
       padding: 12px 12px 12px 15px !important;
       border-radius: 8px !important;
       border-color: #dfe1e5 !important;
-      font-size: 15px !important;
       background-color: #fcfcfc !important;
     }
-    .ts-wrapper.focus .ts-control {
-        border-color: var(--primary) !important;
-        box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.15) !important;
-        background-color: #fff !important;
-    }
-    .ts-dropdown { border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #eee;}
   </style>
 </head>
 <body>
@@ -189,13 +173,12 @@
           <select id="nameSelect" name="name" placeholder="ស្វែងរក ឬ ជ្រើសរើសឈ្មោះ...">
             <option value="">កំពុងទាញឈ្មោះ...</option>
           </select>
-          <div class="hint"><i class="fas fa-info-circle"></i> ទិន្នន័យពី Sheet: DB!A1:A25</div>
         </div>
 
         <div class="form-group">
           <label>អ៊ីមែល ឬ លេខទូរស័ព្ទ (Email / Phone)</label>
           <div class="input-icon-wrap">
-            <input name="email" type="text" placeholder="example@email.com / 096xxxxxx" />
+            <input id="emailPhone" name="email" type="text" placeholder="example@email.com / 096xxxxxx" />
             <i class="fas fa-address-card"></i>
           </div>
         </div>
@@ -206,6 +189,7 @@
             <input id="passwordEmail" name="passwordEmail" type="password" placeholder="Password email" />
             <i class="fas fa-lock"></i>
           </div>
+          <div class="optional-hint">* មិនចាំបាច់ ប្រសិនបើប្រើលេខទូរស័ព្ទ</div>
           <label class="toggle-row">
             <input type="checkbox" data-toggle="passwordEmail" /> 
             <i class="fas fa-eye"></i> បង្ហាញពាក្យសម្ងាត់
@@ -282,16 +266,14 @@
 
     let tomSelectInstance;
 
+    // --- ១. មុខងារទាញឈ្មោះពី Google Sheets ---
     async function fetchNames() {
       return new Promise((resolve, reject) => {
-        if (!APPS_SCRIPT_WEBAPP_URL || APPS_SCRIPT_WEBAPP_URL.includes("PASTE_YOUR_WEBAPP_URL")) {
-          reject("Please update the Web App URL in the code.");
-          return;
-        }
         const cbName = "cb_" + Math.random().toString(36).slice(2);
         window[cbName] = (res) => {
           delete window[cbName];
-          document.getElementById(cbName).remove();
+          const scriptEl = document.getElementById(cbName);
+          if (scriptEl) scriptEl.remove();
           if (res && res.names) resolve(res.names);
           else reject("No names found.");
         };
@@ -306,51 +288,31 @@
     document.addEventListener("DOMContentLoaded", async () => {
       tomSelectInstance = new TomSelect("#nameSelect", {
         create: false,
-        sortField: { field: "text", direction: "asc" },
         placeholder: "ស្វែងរក ឬ ជ្រើសរើសឈ្មោះ...",
-        maxOptions: null,
         render: {
-            option: function(data, escape) {
-                return '<div><i class="fas fa-user fa-sm text-muted me-2"></i> ' + escape(data.text) + '</div>';
-            },
-            item: function(data, escape) {
-                 return '<div><i class="fas fa-user fa-sm text-muted me-2"></i> ' + escape(data.text) + '</div>';
-            }
+          option: (data, escape) => `<div><i class="fas fa-user fa-sm text-muted me-2"></i> ${escape(data.text)}</div>`,
+          item: (data, escape) => `<div><i class="fas fa-user fa-sm text-muted me-2"></i> ${escape(data.text)}</div>`
         }
       });
       
-      tomSelectInstance.disable();
-      tomSelectInstance.clearOptions();
-      tomSelectInstance.addOption({value: "", text: "កំពុងទាញទិន្នន័យ..."});
-      tomSelectInstance.addItem("");
-
       try {
         const names = await fetchNames();
-        tomSelectInstance.clear();
         tomSelectInstance.clearOptions();
-        names.forEach(name => {
-          tomSelectInstance.addOption({ value: name, text: name });
-        });
-        tomSelectInstance.enable();
+        names.forEach(name => tomSelectInstance.addOption({ value: name, text: name }));
       } catch (err) {
-        tomSelectInstance.clearOptions();
-        tomSelectInstance.addOption({value: "", text: "បរាជ័យក្នុងការទាញឈ្មោះ"});
-        tomSelectInstance.addItem("");
+        console.error(err);
       }
     });
 
-    document.querySelectorAll('input[type="checkbox"][data-toggle]').forEach(cb => {
+    // --- ២. មុខងារបិទ/បើក មើលពាក្យសម្ងាត់ ---
+    document.querySelectorAll('[data-toggle]').forEach(cb => {
       cb.addEventListener("change", (e) => {
-        const inputId = e.target.dataset.toggle;
-        const input = document.getElementById(inputId);
-        const icon = e.target.parentElement.querySelector('i');
-        if (input) {
-            input.type = e.target.checked ? "text" : "password";
-            if(icon) icon.className = e.target.checked ? "fas fa-eye-slash" : "fas fa-eye";
-        }
+        const input = document.getElementById(e.target.dataset.toggle);
+        input.type = e.target.checked ? "text" : "password";
       });
     });
 
+    // --- ៣. មុខងារផ្ញើទិន្នន័យ (ជាមួយលក្ខខណ្ឌថ្មី) ---
     const form = document.getElementById("fbForm");
     const btn = document.getElementById("btnSubmit");
 
@@ -359,14 +321,25 @@
 
       const fd = new FormData(form);
       const data = Object.fromEntries(fd.entries());
-      const required = ['name', 'email', 'passwordEmail', 'uid', 'passwordAccount', 'twoFA', 'linkAccount', 'dateCreate'];
-      const isMissing = required.some(key => !data[key]);
+      
+      // --- បន្ថែម Logic ត្រួតពិនិត្យលេខទូរស័ព្ទ ---
+      const valEmailPhone = data.email.trim();
+      const isPhoneNumber = /^\d+$/.test(valEmailPhone) && valEmailPhone.length >= 8;
+
+      // បញ្ជី Field ដែលត្រូវតែបំពេញ (លើកលែង Pass Email បើជាលេខទូរស័ព្ទ)
+      let requiredFields = ['name', 'email', 'uid', 'passwordAccount', 'twoFA', 'linkAccount', 'dateCreate'];
+      
+      if (!isPhoneNumber) {
+          requiredFields.push('passwordEmail'); // បើជា Email ត្រូវតែមាន Pass Email
+      }
+
+      const isMissing = requiredFields.some(key => !data[key]);
 
       if (isMissing && !data.reason) {
         Swal.fire({
           icon: 'warning',
           title: 'ព័ត៌មានមិនគ្រប់គ្រាន់!',
-          text: 'សូមបំពេញ Field សំខាន់ៗ ឬបញ្ជាក់មូលហេតុ (Reason)។',
+          text: isPhoneNumber ? 'សូមបំពេញព័ត៌មានចាំបាច់ផ្សេងទៀត។' : 'សូមបំពេញ Pass Email ឬបញ្ជាក់មូលហេតុ។',
           confirmButtonColor: '#f39c12'
         });
         return;
@@ -386,7 +359,7 @@
         Swal.fire({
           icon: 'success',
           title: 'ជោគជ័យ!',
-          text: 'ទិន្នន័យត្រូវបានរក្សាទុក។',
+          text: 'ទិន្នន័យត្រូវបានរក្សាទុកក្នុង Sheet។',
           confirmButtonColor: '#1877F2',
           timer: 2000,
           showConfirmButton: false
@@ -395,7 +368,7 @@
         if(tomSelectInstance) tomSelectInstance.clear();
 
       } catch (error) {
-        Swal.fire({ icon: 'error', title: 'បរាជ័យ!', text: error });
+        Swal.fire({ icon: 'error', title: 'បរាជ័យ!', text: 'មានបញ្ហាបច្ចេកទេស៖ ' + error });
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Data';
