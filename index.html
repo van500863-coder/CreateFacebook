@@ -28,11 +28,13 @@
     label i { margin-right: 8px; color: var(--primary); font-size: 14px;}
     .input-icon-wrap { position: relative; }
     .input-icon-wrap i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 16px; pointer-events: none; transition: color 0.3s; }
-    input, textarea, select { width: 100%; padding: 14px 14px 14px 45px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 15px; transition: all 0.3s; box-sizing: border-box; background-color: var(--input-bg); color: var(--text-main); }
-    input:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px var(--focus-ring); background-color: #ffffff; }
+    input, textarea, select { width: 100%; padding: 14px 14px 14px 45px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 15px; transition: all 0.3s; box-sizing: border-box; background-color: var(--input-bg); color: var(--text-main); appearance: none; -webkit-appearance: none; -moz-appearance: none; }
+    input:focus, textarea:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px var(--focus-ring); background-color: #ffffff; }
     .input-icon-wrap:focus-within i { color: var(--primary); }
     textarea { min-height: 110px; resize: vertical; padding-top: 16px; }
     .input-icon-wrap textarea + i { top: 24px; }
+    /* Select specific styles to add arrow */
+    .select-wrap::after { content: '\f0d7'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #9ca3af; pointer-events: none; }
     .toggle-row { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--text-secondary); cursor: pointer; user-select: none; width: max-content; }
     .toggle-row:hover { color: var(--primary); }
     .toggle-row input { width: 16px; height: 16px; cursor: pointer; padding: 0; margin: 0; accent-color: var(--primary);}
@@ -123,9 +125,13 @@
 
         <div class="form-group full">
           <label><i class="fas fa-comment-dots"></i> Reason (មូលហេតុ)</label>
-          <div class="input-icon-wrap">
-            <textarea name="reason" placeholder="សរសេរមូលហេតុនៅទីនេះ (បើមាន field ណាមួយមិនបានបំពេញ)..."></textarea>
-            <i class="fas fa-pen"></i>
+          <div class="input-icon-wrap select-wrap">
+            <select name="reason">
+              <option value="" disabled selected>ជ្រើសរើសមូលហេតុ...</option>
+              <option value="Done">Done</option>
+              <option value="No">No</option>
+            </select>
+            <i class="fas fa-tasks"></i>
           </div>
         </div>
 
@@ -173,7 +179,6 @@
       try {
         const names = await fetchNames();
         tomSelectInstance.clearOptions();
-        // បញ្ចូលឈ្មោះទាំងអស់ទៅក្នុង Dropdown
         names.forEach(name => tomSelectInstance.addOption({ value: name, text: name }));
       } catch (err) {
         tomSelectInstance.clearOptions();
@@ -189,7 +194,7 @@
       });
     });
 
-    // --- ៣. Auto Extract UID (ជាមួយកូដជំនួយពី Apps Script) ---
+    // --- ៣. Auto Extract UID ---
     const linkAccountInput = document.getElementById("linkAccountInput");
     const uidInput = document.getElementById("uidInput");
 
@@ -210,7 +215,7 @@
       } else {
         const idQueryMatch = rawUrl.match(/[?&]id=(\d+)/i);
         const profilePathMatch = rawUrl.match(/facebook\.com\/(?:profile\.php\/?)?(\d{6,})/i);
-        const fbMeMatch = rawUrl.match(/fb\.me\/(?:profile\.php\/?)?(\d{6,})/i); // For fb.me with ID
+        const fbMeMatch = rawUrl.match(/fb\.me\/(?:profile\.php\/?)?(\d{6,})/i); 
         
         if (idQueryMatch) directUid = idQueryMatch[1];
         else if (profilePathMatch) directUid = profilePathMatch[1];
@@ -222,7 +227,6 @@
         return;
       }
 
-      // ប្រសិនបើជា Short Link ដែលអត់មានលេខ ID បង្ហាញ
       if (rawUrl.includes("share") || rawUrl.includes("fb.me") || rawUrl.includes("facebook.com")) {
         uidInput.value = "កំពុងស្វែងរក UID...";
         
@@ -261,7 +265,7 @@
       if (!isPhoneNumber) requiredFields.push('passwordEmail');
 
       if (requiredFields.some(key => !data[key]) && !data.reason) {
-        Swal.fire({ icon: 'warning', title: 'ព័ត៌មានមិនគ្រប់គ្រាន់!', text: 'សូមបំពេញចន្លោះដែលខ្វះ ឬសរសេរមូលហេតុបញ្ជាក់។', confirmButtonColor: '#f59e0b' });
+        Swal.fire({ icon: 'warning', title: 'ព័ត៌មានមិនគ្រប់គ្រាន់!', text: 'សូមបំពេញចន្លោះដែលខ្វះ ឬជ្រើសរើសមូលហេតុបញ្ជាក់។', confirmButtonColor: '#f59e0b' });
         return;
       }
 
